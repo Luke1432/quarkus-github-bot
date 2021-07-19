@@ -100,7 +100,7 @@ public class AnalyzeWorkflowRunResults {
             return;
         }
 
-        if (workflowRun.getConclusion() != Conclusion.FAILURE && workflowRun.getConclusion() != Conclusion.CANCELLED) {
+        if (workflowRun.getConclusion() != Conclusion.FAILURE) {
             return;
         }
 
@@ -128,7 +128,15 @@ public class AnalyzeWorkflowRunResults {
         String commentReport = workflowReportFormatter.getCommentReport(workflowReport,
                 artifactsAvailable,
                 checkRunOptional.orElse(null),
-                WorkflowConstants.MESSAGE_ID_ACTIVE);
+                WorkflowConstants.MESSAGE_ID_ACTIVE,
+                true);
+        if (commentReport.length() > GITHUB_FIELD_LENGTH_HARD_LIMIT) {
+            commentReport = workflowReportFormatter.getCommentReport(workflowReport,
+                    artifactsAvailable,
+                    checkRunOptional.orElse(null),
+                    WorkflowConstants.MESSAGE_ID_ACTIVE,
+                    false);
+        }
         if (!quarkusBotConfig.isDryRun()) {
             pullRequest.comment(commentReport);
         } else {
